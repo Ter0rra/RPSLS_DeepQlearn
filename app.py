@@ -1,7 +1,4 @@
-"""
-Rock-Paper-Scissors-Lizard-Spock with Deep Reinforcement Learning
-Flask web application where AI learns to beat human players
-"""
+# Rock-Paper-Scissors-Lizard-Spock with Deep Reinforcement Learning
 
 from flask import Flask, render_template, jsonify, request
 import json
@@ -12,14 +9,25 @@ from deep_learning_agent import DeepLearningAgent
 
 app = Flask(__name__)
 
-# Configuration
+# config
+# path model & stats
 DATA_DIR = Path("data")
 DATA_DIR.mkdir(exist_ok=True)
 MODEL_FILE = DATA_DIR / "dqn_model.pth"
 STATS_FILE = DATA_DIR / "game_stats.json"
 
+# game choices
 CHOICES = ['rock', 'paper', 'scissors', 'lizard', 'spock']
 
+EMOJIS = {
+    'rock': '🪨',
+    'paper': '📄',
+    'scissors': '✂️',
+    'lizard': '🦎',
+    'spock': '🖖'
+}
+
+# game rules
 RULES = {
     'rock': ['scissors', 'lizard'],
     'paper': ['rock', 'spock'],
@@ -28,15 +36,7 @@ RULES = {
     'spock': ['rock', 'scissors']
 }
 
-EMOJIS = {
-    'rock': '🗿',
-    'paper': '📄',
-    'scissors': '✂️',
-    'lizard': '🦎',
-    'spock': '🖖'
-}
-
-# Initialize AI agent (pattern length = 10)
+# initialize  DeepQagent
 agent = DeepLearningAgent(
     pattern_length=10,
     learning_rate=0.001,
@@ -45,15 +45,14 @@ agent = DeepLearningAgent(
     epsilon_min=0.1
 )
 
-# Try to load existing model
+# try to load existing model 
 if MODEL_FILE.exists():
-    print("📚 Loading existing AI model...")
     agent.load_model(MODEL_FILE)
     print("✅ Model loaded successfully!")
 else:
     print("🆕 Starting with fresh AI model")
 
-# ==================== GAME STATS ====================
+# => game stats
 
 def load_game_stats():
     """Load game statistics"""
@@ -72,7 +71,7 @@ def save_game_stats(stats):
     with open(STATS_FILE, 'w') as f:
         json.dump(stats, f, indent=2)
 
-# ==================== GAME LOGIC ====================
+# => game logic 
 
 def determine_winner(player, ai):
     """Determine the winner"""
@@ -91,20 +90,21 @@ def get_explanation(player, ai, winner):
     else:
         return f"AI wins! {EMOJIS[ai]} {ai.capitalize()} beats {EMOJIS[player]} {player.capitalize()}"
 
-# ==================== ROUTES ====================
-
+# => Flask route 
+# main route
 @app.route('/')
 def index():
     """Main page"""
     return render_template('index.html')
 
+# stat route
 @app.route('/api/stats')
 def get_stats():
     """Get current statistics"""
     game_stats = load_game_stats()
     agent_stats = agent.get_stats()
     
-    # Calculate win rates
+    # win rates
     total = game_stats['total_games']
     ai_winrate = (game_stats['ai_wins'] / total * 100) if total > 0 else 0
     player_winrate = (game_stats['player_wins'] / total * 100) if total > 0 else 0
@@ -124,6 +124,7 @@ def get_stats():
         'total_predictions': agent_stats['total_predictions']
     })
 
+# play route
 @app.route('/api/play', methods=['POST'])
 def play():
     """Play a round"""
@@ -133,17 +134,17 @@ def play():
     if player_choice not in CHOICES:
         return jsonify({'error': 'Invalid choice'}), 400
     
-    # AI makes decision
+    # ai choice
     ai_choice, prediction = agent.choose_action()
     
-    # Determine winner
+    # who win
     winner = determine_winner(player_choice, ai_choice)
     explanation = get_explanation(player_choice, ai_choice, winner)
     
-    # AI learns from this game
+    # agent learn from game
     agent.learn_from_game(player_choice, ai_choice, prediction)
     
-    # Update game stats
+    # update stats
     game_stats = load_game_stats()
     game_stats['total_games'] += 1
     
@@ -156,7 +157,7 @@ def play():
     
     save_game_stats(game_stats)
     
-    # Save AI model every 10 games
+    # save every 10 games
     if game_stats['total_games'] % 10 == 0:
         agent.save_model(MODEL_FILE)
         print(f"💾 Model saved at game {game_stats['total_games']}")
@@ -173,18 +174,19 @@ def play():
         'prediction_emoji': EMOJIS[prediction]
     })
 
+# reset route
 @app.route('/api/reset', methods=['POST'])
 def reset():
     """Reset the game and AI"""
     global agent
     
-    # Delete saved files
+    # delete files
     if MODEL_FILE.exists():
         MODEL_FILE.unlink()
     if STATS_FILE.exists():
         STATS_FILE.unlink()
     
-    # Create new agent
+    # initalise new DeepQagent
     agent = DeepLearningAgent(
         pattern_length=10,
         learning_rate=0.001,
@@ -197,6 +199,7 @@ def reset():
     
     return jsonify({'success': True, 'message': 'Game reset successfully'})
 
+# start game 
 if __name__ == '__main__':
     print("=" * 60)
     print("🎮 Rock-Paper-Scissors-Lizard-Spock - DQN Edition")
