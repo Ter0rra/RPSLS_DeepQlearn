@@ -1,13 +1,13 @@
 # 🖖 Rock-Paper-Scissors-Lizard-Spock - Deep RL Edition
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.7+-red.svg)](https://pytorch.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > An AI-powered web game where a Deep Q-Network learns to predict and beat human players in the classic Rock-Paper-Scissors-Lizard-Spock game from *The Big Bang Theory*.
 
-![Game Screenshot](https://via.placeholder.com/800x400/0a0e27/00d9ff?text=RPSLS+AI+Game)
+![Game Screenshot](.\data\rpsls_demo.jpeg)
 
 ## 🎮 Overview
 
@@ -20,7 +20,7 @@ This project implements a **self-learning AI** that plays Rock-Paper-Scissors-Li
 
 **After 200-500 games, the AI typically achieves 50-60% prediction accuracy, making it extremely difficult to beat!**
 
-**Let's try it if you want on [render.com](your path)
+**Let's try it if you want on [render.com](https://rpsls-deepqlearn.onrender.com)**
 
 ## ✨ Features
 
@@ -85,7 +85,6 @@ rpsls-deep-rl/
 ├── app.py                      # Flask game
 ├── deep_learning_agent.py      # DQN Agent implementation
 ├── requirements.txt            # Python dependencies
-├── render.yaml                 # Render env
 ├── test-script.py              # to check all env & files
 │
 ├── templates/
