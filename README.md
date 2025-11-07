@@ -82,6 +82,9 @@ rpsls-deep-rl/
 ├── requirements.txt            # Python dependencies
 ├── render.yaml                 # Render env
 │
+├── test/
+│   └── test-script.py          # to check all env & files
+│
 ├── templates/
 │   └── index.html             # Frontend UI
 │
