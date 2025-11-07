@@ -7,7 +7,7 @@
 
 > An AI-powered web game where a Deep Q-Network learns to predict and beat human players in the classic Rock-Paper-Scissors-Lizard-Spock game from *The Big Bang Theory*.
 
-![Game Screenshot](data\rpsls_demo.jpeg)
+![Game Screenshot](data\rpsls_demo.png)
 
 ## 🎮 Overview
 
