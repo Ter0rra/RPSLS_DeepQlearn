@@ -64,6 +64,11 @@ cd rpsls-deep-rl
 pip install -r requirements.txt
 ```
 
+### 2.1. optionnal *check env/files/folder/app* 
+```bash
+python test-script.py
+```
+
 ### 3. Run the application
 ```bash
 python app.py
@@ -81,19 +86,17 @@ rpsls-deep-rl/
 ├── deep_learning_agent.py      # DQN Agent implementation
 ├── requirements.txt            # Python dependencies
 ├── render.yaml                 # Render env
-│
-├── test/
-│   └── test-script.py          # to check all env & files
+├── test-script.py              # to check all env & files
 │
 ├── templates/
-│   └── index.html             # Frontend UI
+│   └── index.html              # Frontend UI
 │
-├── data/                      # Auto-created on first run
-│   ├── dqn_model.pth         # Saved neural network weights
-│   └── game_stats.json       # Game statistics
+├── data/                       # Auto-created on first run
+│   ├── dqn_model.pth           # Saved neural network weights
+│   └── game_stats.json         # Game statistics
 │
-├── LICENSE
-└── README.md                  # This file
+├── LICENSE                     # MIT License
+└── README.md                   # This file
 ```
 
 ## 🎯 How It Works
