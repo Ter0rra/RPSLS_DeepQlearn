@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖖 RPSLS - AI Self-Learning Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated atom background */
+        .atom-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .atom {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            animation: float 20s infinite ease-in-out;
+            opacity: 0.15;
+        }
+
+        .atom:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .atom:nth-child(2) { top: 60%; left: 80%; animation-delay: 5s; }
+        .atom:nth-child(3) { top: 80%; left: 20%; animation-delay: 10s; }
+        .atom:nth-child(4) { top: 30%; left: 70%; animation-delay: 15s; }
+        .atom:nth-child(5) { top: 50%; left: 50%; animation-delay: 7s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(30px, -30px) rotate(90deg); }
+            50% { transform: translate(-20px, 20px) rotate(180deg); }
+            75% { transform: translate(40px, 10px) rotate(270deg); }
+        }
+
+        .nucleus {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00d9ff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px #00d9ff;
+        }
+
+        .electron-orbit {
+            position: absolute;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .orbit-1 {
+            width: 80px;
+            height: 80px;
+            animation: rotate 4s linear infinite;
+        }
+
+        .orbit-2 {
+            width: 120px;
+            height: 120px;
+            animation: rotate 6s linear infinite reverse;
+            transform: translate(-50%, -50%) rotate(60deg);
+        }
+
+        .orbit-3 {
+            width: 150px;
+            height: 150px;
+            animation: rotate 8s linear infinite;
+            transform: translate(-50%, -50%) rotate(-30deg);
+        }
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .electron {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff6b6b;
+            top: -4px;
+            left: 50%;
+            margin-left: -4px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(0, 217, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #00d9ff;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00d9ff;
+            color: #00d9ff;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #a8dadc;
+        }
+
+        .bazinga {
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0, 217, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #00d9ff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 217, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 217, 255, 0.4);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #00d9ff;
+            text-shadow: 0 0 10px #00d9ff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #a8dadc;
+        }
+
+        .ai-info {
+            background: rgba(255, 107, 107, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ff6b6b;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .ai-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ai-info h2 {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px #ff6b6b;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            border: 2px solid #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .reset-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+        }
+
+        .ai-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            text-align: center;
+        }
+
+        .result-box {
+            background: rgba(168, 218, 220, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #a8dadc;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+            box-shadow: 0 0 30px rgba(168, 218, 220, 0.3);
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .choice-display {
+            text-align: center;
+        }
+
+        .choice-emoji {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            animation: bounce 0.5s ease-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .choice-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+
+        .vs {
+            font-size: 3rem;
+            text-align: center;
+            color: #ff6b6b;
+            text-shadow: 0 0 20px #ff6b6b;
+        }
+
+        .result-message {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .result-message.win {
+            background: rgba(46, 213, 115, 0.3);
+            border: 2px solid #2ed573;
+            color: #2ed573;
+            text-shadow: 0 0 10px #2ed573;
+        }
+
+        .result-message.lose {
+            background: rgba(255, 71, 87, 0.3);
+            border: 2px solid #ff4757;
+            color: #ff4757;
+            text-shadow: 0 0 10px #ff4757;
+        }
+
+        .result-message.tie {
+            background: rgba(255, 195, 18, 0.3);
+            border: 2px solid #ffc312;
+            color: #ffc312;
+            text-shadow: 0 0 10px #ffc312;
+        }
+
+        .prediction-info {
+            text-align: center;
+            font-size: 1rem;
+            color: #a8dadc;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .choices-box {
+            background: rgba(0, 217, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #00d9ff;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .choices-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            color: #00d9ff;
+            text-shadow: 0 0 15px #00d9ff;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .choice-btn {
+            background: rgba(0, 217, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid #00d9ff;
+            border-radius: 15px;
+            padding: 30px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .choice-btn:hover {
+            background: rgba(0, 217, 255, 0.3);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
+        }
+
+        .choice-btn:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .choice-btn-emoji {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: rgba(255, 107, 107, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ff6b6b;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .info-box h3 {
+            margin-bottom: 15px;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px #ff6b6b;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            margin-bottom: 10px;
+            padding-left: 30px;
+            position: relative;
+            color: #a8dadc;
+        }
+
+        .info-box li:before {
+            content: '⚛️';
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .vs {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated atoms background -->
+    <div class="atom-container">
+        <div class="atom">
+            <div class="nucleus"></div>
+            <div class="electron-orbit orbit-1">
+                <div class="electron"></div>
+            </div>
+            <div class="electron-orbit orbit-2">
+                <div class="electron"></div>
+            </div>
+            <div class="electron-orbit orbit-3">
+                <div class="electron"></div>
+            </div>
+        </div>
+        <div class="atom">
+            <div class="nucleus"></div>
+            <div class="electron-orbit orbit-1">
+                <div class="electron"></div>
+            </div>
+            <div class="electron-orbit orbit-2">
+                <div class="electron"></div>
+            </div>
+        </div>
+        <div class="atom">
+            <div class="nucleus"></div>
+            <div class="electron-orbit orbit-1">
+                <div class="electron"></div>
+            </div>
+            <div class="electron-orbit orbit-3">
+                <div class="electron"></div>
+            </div>
+        </div>
+        <div class="atom">
+            <div class="nucleus"></div>
+            <div class="electron-orbit orbit-2">
+                <div class="electron"></div>
+            </div>
+            <div class="electron-orbit orbit-3">
+                <div class="electron"></div>
+            </div>
+        </div>
+        <div class="atom">
+            <div class="nucleus"></div>
+            <div class="electron-orbit orbit-1">
+                <div class="electron"></div>
+            </div>
+            <div class="electron-orbit orbit-2">
+                <div class="electron"></div>
+            </div>
+            <div class="electron-orbit orbit-3">
+                <div class="electron"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🖖 Rock-Paper-Scissors-Lizard-Spock</h1>
+            <p>Self-Learning AI powered by <span class="bazinga">Deep Reinforcement Learning</span></p>
+            <p style="font-size: 0.9rem; margin-top: 10px; opacity: 0.7;">As seen in The Big Bang Theory! 🔬</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-games">0</div>
+                <div class="stat-label">Total Games</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="player-wins">0</div>
+                <div class="stat-label">Your Wins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="ai-wins">0</div>
+                <div class="stat-label">AI Wins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="ai-winrate">0%</div>
+                <div class="stat-label">AI Win Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="prediction-accuracy">0%</div>
+                <div class="stat-label">AI Accuracy</div>
+            </div>
+        </div>
+
+        <!-- AI Info -->
+        <div class="ai-info">
+            <div class="ai-info-header">
+                <div>
+                    <h2>🧠 Neural Network Brain</h2>
+                    <p>Deep Q-Network learning your patterns in real-time</p>
+                </div>
+                <button class="reset-btn" onclick="resetGame()">🔄 Reset AI</button>
+            </div>
+            <div class="ai-stats">
+                <div>
+                    <div class="stat-value" id="pattern-length">10</div>
+                    <div class="stat-label">Pattern Length</div>
+                </div>
+                <div>
+                    <div class="stat-value" id="epsilon">0.400</div>
+                    <div class="stat-label">Exploration</div>
+                </div>
+                <div>
+                    <div class="stat-value" id="memory-size">0</div>
+                    <div class="stat-label">Memory Size</div>
+                </div>
+                <div>
+                    <div class="stat-value" id="predictions">0/0</div>
+                    <div class="stat-label">Correct Predictions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Box -->
+        <div class="result-box" id="result-box">
+            <h2 style="text-align: center; margin-bottom: 25px; color: #a8dadc;">🎯 Last Round Result</h2>
+            <div class="result-grid">
+                <div class="choice-display">
+                    <div class="choice-emoji" id="player-emoji">❓</div>
+                    <div class="choice-label">You</div>
+                    <div class="stat-label" id="player-choice-label"></div>
+                </div>
+                <div class="vs">⚔️</div>
+                <div class="choice-display">
+                    <div class="choice-emoji" id="ai-emoji">❓</div>
+                    <div class="choice-label">AI</div>
+                    <div class="stat-label" id="ai-choice-label"></div>
+                </div>
+            </div>
+            <div class="result-message" id="result-message"></div>
+            <div class="prediction-info" id="prediction-info"></div>
+        </div>
+
+        <!-- Choices -->
+        <div class="choices-box">
+            <h2>🎮 Make Your Choice!</h2>
+            <div class="choices-grid">
+                <button class="choice-btn" onclick="playChoice('rock')">
+                    <span class="choice-btn-emoji">🗿</span>
+                    Rock
+                </button>
+                <button class="choice-btn" onclick="playChoice('paper')">
+                    <span class="choice-btn-emoji">📄</span>
+                    Paper
+                </button>
+                <button class="choice-btn" onclick="playChoice('scissors')">
+                    <span class="choice-btn-emoji">✂️</span>
+                    Scissors
+                </button>
+                <button class="choice-btn" onclick="playChoice('lizard')">
+                    <span class="choice-btn-emoji">🦎</span>
+                    Lizard
+                </button>
+                <button class="choice-btn" onclick="playChoice('spock')">
+                    <span class="choice-btn-emoji">🖖</span>
+                    Spock
+                </button>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="info-box">
+            <h3>⚛️ How Does It Work?</h3>
+            <ul>
+                <li>🧠 The AI uses a <strong>Deep Q-Network (DQN)</strong> with PyTorch</li>
+                <li>📊 It observes your last <strong>10 moves</strong> to detect patterns</li>
+                <li>🎯 Neural network predicts your next move with increasing accuracy</li>
+                <li>🛡️ AI plays the counter-move to beat your prediction</li>
+                <li>📈 The more you play, the smarter it gets (becomes unbeatable!)</li>
+                <li>💾 Memory is saved between sessions - it never forgets!</li>
+            </ul>
+            <p style="margin-top: 15px; color: #a8dadc; font-size: 0.9rem; opacity: 0.8;">
+                After ~200-500 games, the AI reaches 50-60% accuracy and becomes extremely difficult to beat.
+                Try varying your patterns to keep it guessing! <span class="bazinga">BAZINGA!</span> 🎭
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Load stats on startup
+        loadStats();
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                updateStatsDisplay(data);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function updateStatsDisplay(data) {
+            document.getElementById('total-games').textContent = data.total_games;
+            document.getElementById('player-wins').textContent = data.player_wins;
+            document.getElementById('ai-wins').textContent = data.ai_wins;
+            document.getElementById('ai-winrate').textContent = data.ai_winrate + '%';
+            document.getElementById('prediction-accuracy').textContent = data.prediction_accuracy + '%';
+            document.getElementById('pattern-length').textContent = data.pattern_length;
+            document.getElementById('epsilon').textContent = data.epsilon;
+            document.getElementById('memory-size').textContent = data.memory_size;
+            document.getElementById('predictions').textContent = 
+                data.correct_predictions + '/' + data.total_predictions;
+        }
+
+        async function playChoice(choice) {
+            try {
+                const response = await fetch('/api/play', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ choice: choice })
+                });
+
+                const result = await response.json();
+                
+                // Display result
+                displayResult(result);
+                
+                // Reload stats
+                await loadStats();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error playing. Please try again.');
+            }
+        }
+
+        function displayResult(result) {
+            const resultBox = document.getElementById('result-box');
+            const resultMessage = document.getElementById('result-message');
+            
+            // Update emojis and labels
+            document.getElementById('player-emoji').textContent = result.player_emoji;
+            document.getElementById('ai-emoji').textContent = result.ai_emoji;
+            document.getElementById('player-choice-label').textContent = result.player_choice;
+            document.getElementById('ai-choice-label').textContent = result.ai_choice;
+            
+            // Result message
+            resultMessage.textContent = result.explanation;
+            
+            let messageClass = '';
+            if (result.winner === 'player') {
+                messageClass = 'win';
+            } else if (result.winner === 'ai') {
+                messageClass = 'lose';
+            } else {
+                messageClass = 'tie';
+            }
+            
+            resultMessage.className = 'result-message ' + messageClass;
+            
+            // Prediction info
+            const predictionText = result.prediction_correct 
+                ? `✅ AI correctly predicted your move! Predicted: ${result.prediction_emoji} ${result.prediction}`
+                : `❌ AI predicted: ${result.prediction_emoji} ${result.prediction} | You played: ${result.player_emoji} ${result.player_choice}`;
+            
+            document.getElementById('prediction-info').textContent = predictionText;
+            
+            // Show the box
+            resultBox.classList.add('show');
+            
+            // Scroll to result
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        async function resetGame() {
+            if (!confirm('Are you sure you want to reset the entire AI memory? This cannot be undone!')) {
+                return;
+            }
+            
+            try {
+                await fetch('/api/reset', { method: 'POST' });
+                document.getElementById('result-box').classList.remove('show');
+                await loadStats();
+                alert('✅ Game and AI memory reset successfully!');
+            } catch (error) {
+                console.error('Error resetting:', error);
+                alert('Error resetting the game');
+            }
+        }
+    </script>
+</body>
+</html>
