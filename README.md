@@ -49,8 +49,8 @@ This project implements a **self-learning AI** that plays Rock-Paper-Scissors-Li
 
 ## 📋 Requirements
 
-- Python 3.8+
-- PyTorch 2.0+
+- Python 3.10+
+- PyTorch 2.7+
 - Flask 3.0+
 - NumPy
 
@@ -58,7 +58,7 @@ This project implements a **self-learning AI** that plays Rock-Paper-Scissors-Li
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/rpsls-deep-rl.git
+git clone https://github.com/Ter0rra/RPSLS_DeepQlearn.git
 cd rpsls-deep-rl
 ```
 
@@ -91,7 +91,7 @@ rpsls-deep-rl/
 ├── test-script.py              # to check all env & files
 │
 ├── templates/
-│   └── index.html              # Frontend UI
+│   └── index.html              # Frontend UI (LLM has helped for this part)
 │
 ├── data/                       # Auto-created on first run
 │   ├── dqn_model.pth           # Saved neural network weights
@@ -259,13 +259,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **The Big Bang Theory** for popularizing RPSLS
 - **Sam Kass** for inventing the original game
 - **DeepMind** for pioneering Deep Q-Networks
-- **All frontend dev's friends** for help me with the template
+- **LLM** for help on htlm parts
 
 ## 📧 Contact
 
 Ter0rra - [Mail](mailto:terorra.ia.data@gmail.com)
 
-Project Link: [https://github.com/yourusername/rpsls-deep-rl](https://github.com/yourusername/rpsls-deep-rl)
+Project Link: [https://github.com/Ter0rra/RPSLS_DeepQlearn](https://github.com/Ter0rra/RPSLS_DeepQlearn)
 
 ---
 
