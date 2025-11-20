@@ -24,6 +24,9 @@ This project implements a **self-learning AI** that plays Rock-Paper-Scissors-Li
 **After 200-500 games, the AI typically achieves 50-60% prediction accuracy, making it extremely difficult to beat!**
 
 **Let's try it if you want on [render.com](https://rpsls-deepqlearn.onrender.com)**
+- click on link 
+- waiting time ~5/7min (building time)
+- let's play 
 
 ## ✨ Features
 
